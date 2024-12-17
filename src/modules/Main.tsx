@@ -221,7 +221,7 @@ function MainPage() {
           </p>
 
           <p className="w-[75%] self-center text-center font-en text-sm lg:text-lg">
-            Write a appreciation message to someone.
+            Write an appreciation message to someone.
           </p>
         </div>
       </main>
