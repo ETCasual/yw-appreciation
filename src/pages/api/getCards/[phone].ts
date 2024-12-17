@@ -33,6 +33,7 @@ export default async function handler(
             message: true,
             image: true,
             seen: true,
+            createdAt: true,
           },
         })
         .then((data) =>

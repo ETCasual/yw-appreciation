@@ -111,10 +111,10 @@ function MainPage() {
       </Modal>
       <Modal
         isOpen={inboxOpen}
-        placement="center"
+        placement="bottom-center"
         scrollBehavior="inside"
         className="dark"
-        closeButton={<></>}
+        onClose={() => setInboxOpen(false)}
       >
         <ModalContent className="flex flex-col gap-1">
           {() => (
@@ -123,28 +123,36 @@ function MainPage() {
                 信箱 <span className="font-en">Inbox</span>
               </ModalHeader>
               <ModalBody>
-                {inboxData.map((data) => {
-                  return (
-                    <button
-                      onClick={() => router.push(`/${data.id}`)}
-                      key={data.id}
-                      className={`flex w-full flex-row items-center gap-2 rounded-xl bg-white/80 p-3 text-sm`}
-                    >
-                      {data.image ? (
-                        <img
-                          className="h-[25px] w-[25px] rounded-full"
-                          alt=""
-                          src={data.image}
-                        />
-                      ) : (
-                        <div className="h-[25px] w-[25px]" />
-                      )}
-                      <p className="line-clamp-2 w-full  text-left text-xs">
-                        {data.message}
-                      </p>
-                    </button>
-                  );
-                })}
+                {inboxData
+                  .sort(
+                    (a, b) =>
+                      new Date(b.createdAt).getTime() -
+                      new Date(a.createdAt).getTime(),
+                  )
+                  .map((data) => {
+                    return (
+                      <button
+                        onClick={() => router.push(`/${data.id}`)}
+                        key={data.id}
+                        className={`${
+                          data.seen ? "opacity-50" : ""
+                        } flex w-full flex-row items-center gap-2 rounded-xl bg-white/80 p-3 text-sm`}
+                      >
+                        {data.image ? (
+                          <img
+                            className="h-[25px] w-[25px] rounded-full"
+                            alt=""
+                            src={data.image}
+                          />
+                        ) : (
+                          <div className="h-[25px] w-[25px]" />
+                        )}
+                        <p className="line-clamp-2 w-full  text-left text-xs">
+                          {data.message}
+                        </p>
+                      </button>
+                    );
+                  })}
               </ModalBody>
             </>
           )}
