@@ -11,7 +11,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
     <>
       <Head>
         <title>Appreciation | YWKL</title>
-        <meta name="description" content="Happy Thanksgiving!" />
+        <meta name="description" content="YW Appreciation Dinner" />
       </Head>
       <NextUIProvider>
         <Component {...pageProps} />
