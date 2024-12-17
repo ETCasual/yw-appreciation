@@ -42,7 +42,7 @@ function MainPage() {
         isOpen={modalOpen}
         placement="center"
         className="dark"
-        closeButton={<></>}
+        onClose={() => setModalOpen(false)}
       >
         <ModalContent>
           {() => (
@@ -140,12 +140,16 @@ function MainPage() {
                       >
                         {data.image ? (
                           <img
-                            className="h-[25px] w-[25px] rounded-full"
+                            className="h-[25px] w-[25px] rounded-full object-cover"
                             alt=""
                             src={data.image}
                           />
                         ) : (
-                          <div className="h-[25px] w-[25px]" />
+                          <img
+                            className="h-[25px] w-[25px] rounded-full object-cover"
+                            alt=""
+                            src={"/yw_logo.png"}
+                          />
                         )}
                         <p className="line-clamp-2 w-full  text-left text-xs">
                           {data.message}
@@ -195,7 +199,7 @@ function MainPage() {
             信箱 <span className="font-en">Inbox</span>
           </button>
         </div>
-        <Envelope hint sending />
+        <Envelope setModalOpen={setModalOpen} hint sending />
 
         <div className="text-shadow absolute bottom-[16.5%] left-1/2 flex w-full -translate-x-1/2 flex-col text-white lg:bottom-10 3xl:bottom-20">
           <p className="w-full text-center font-chi text-2xl lg:text-4xl">

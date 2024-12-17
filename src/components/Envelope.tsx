@@ -3,7 +3,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { type FunctionComponent, KeyboardEventHandler, useState } from "react";
+import {
+  type FunctionComponent,
+  type Dispatch,
+  type SetStateAction,
+  useState,
+} from "react";
 import { Formik, Form, Field } from "formik";
 import { sendFetch, uploadFile } from "../helpers/uploadFile";
 import { Oval } from "react-loader-spinner";
@@ -17,10 +22,10 @@ import { useRouter } from "next/router";
 interface EnvelopeProps {
   hint?: boolean;
   sending?: boolean;
-  to?: string;
   message?: string;
   image?: string | null;
   id?: string;
+  setModalOpen?: Dispatch<SetStateAction<boolean>>;
 }
 
 export const Envelope: FunctionComponent<EnvelopeProps> = ({
@@ -29,6 +34,7 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
   message,
   image,
   id,
+  setModalOpen,
 }) => {
   const [open, setOpen] = useState(false);
   const [hint, setHint] = useState(hintDefault);
@@ -43,7 +49,10 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
         open ? " open" : " new cursor-pointer"
       } h-[250px] w-[325px] sm:h-[265px] sm:w-[370px] sm:max-w-[380px] lg:h-[300px] lg:w-[450px] lg:max-w-none 3xl:h-[366.66667px] 3xl:w-[550px] 3xl:max-w-none`}
       onClick={async () => {
-        if (!number) return;
+        if (!number && sending) {
+          setModalOpen?.(true);
+          return;
+        }
         setOpen(true);
         setHint(false);
 
@@ -59,10 +68,14 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
         {hint && (
           <div className="absolute left-1/2 top-1/3 z-10 flex w-full -translate-x-1/2 -translate-y-1/2 animate-pulse flex-col items-center justify-center text-black">
             <p className="font-chi text-2xl font-bold">
-              {number ? "点击打开" : "请先登入"}
+              {!sending ? "点击打开" : number ? "点击打开" : "请先登入"}
             </p>
             <p className="font-en text-lg">
-              {number ? "Click to open" : "Please login first"}
+              {!sending
+                ? "Click to open"
+                : number
+                  ? "Click to open"
+                  : "Please login first"}
             </p>
           </div>
         )}
