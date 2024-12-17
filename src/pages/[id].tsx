@@ -5,7 +5,6 @@ import { type NextPage, type GetServerSideProps } from "next";
 import Head from "next/head";
 
 export type Card = {
-  from: string;
   to: string;
   message: string;
   image: string | null;
@@ -41,7 +40,6 @@ export const getServerSideProps = (async (context) => {
   if (res.ok)
     return {
       props: {
-        from: card.card.from ?? "",
         to: card.card.to ?? "",
         message: card.card.message ?? "",
         image: card.card.image ?? "",

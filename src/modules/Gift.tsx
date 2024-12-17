@@ -10,7 +10,7 @@ export const GiftPage: NextPage<Card> = (props) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (props.from === "" && props.to === "") void router.push("/");
+    if (props.to === "") void router.push("/");
   }, []);
   return (
     <main

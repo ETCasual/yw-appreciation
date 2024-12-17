@@ -9,7 +9,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<{
     card?: {
-      from: string;
       to: string;
       message: string;
       image: string | null;
@@ -27,7 +26,6 @@ export default async function handler(
             id: id as string,
           },
           select: {
-            from: true,
             to: true,
             message: true,
             image: true,
