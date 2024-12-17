@@ -15,5 +15,6 @@ model Card {
     to        String
     message   String   @db.Text
     image     String?
+    seen      Boolean  @default(false)
     createdAt DateTime @default(now())
 }

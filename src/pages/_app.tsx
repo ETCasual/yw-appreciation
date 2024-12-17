@@ -4,7 +4,7 @@ import "@/styles/globals.css";
 import Head from "next/head";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { NextUIProvider } from "@nextui-org/system";
 
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
@@ -13,9 +13,9 @@ const MyApp: AppType = ({ Component, pageProps }) => {
         <title>Appreciation | YWKL</title>
         <meta name="description" content="Happy Thanksgiving!" />
       </Head>
-      <UserProvider>
+      <NextUIProvider>
         <Component {...pageProps} />
-      </UserProvider>
+      </NextUIProvider>
       <ToastContainer position="bottom-center" />
     </>
   );

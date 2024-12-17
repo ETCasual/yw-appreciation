@@ -8,6 +8,7 @@ export type Card = {
   to: string;
   message: string;
   image: string | null;
+  id: string;
 };
 
 const Gift: NextPage<Card> = (card) => {
@@ -29,26 +30,28 @@ const Gift: NextPage<Card> = (card) => {
 export const getServerSideProps = (async (context) => {
   // Fetch data from external API
   const res = await fetch(
-    `http://localhost:3000/api/getCard/${context.params?.id as string}`,
+    `https://appreciation.fgacycyw.com/api/getCard/${
+      context.params?.id as string
+    }`,
     {
       method: "GET",
     },
   );
   const card = await res.json();
-  console.log("card", card);
 
-  if (res.ok)
+  if (res.ok) {
     return {
       props: {
+        id: card.card.id ?? "",
         to: card.card.to ?? "",
         message: card.card.message ?? "",
         image: card.card.image ?? "",
       },
     };
-  else
+  } else
     return {
       props: {
-        from: "",
+        id: "",
         to: "",
         message: "",
         image: "",

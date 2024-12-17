@@ -8,28 +8,31 @@ import type { NextApiRequest, NextApiResponse } from "next";
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<{
-    card?: {
-      to: string;
-      message: string;
-      image: string | null;
-    } | null;
+    card?:
+      | {
+          to: string;
+          message: string;
+          image: string | null;
+        }[]
+      | null;
     error?: string;
   }>,
 ) {
   if (req.method === "GET") {
-    const id = req.query.id;
+    const phone = req.query.phone;
 
     try {
       await db.card
-        .findUnique({
+        .findMany({
           where: {
-            id: id as string,
+            to: phone as string,
           },
           select: {
+            id: true,
             to: true,
             message: true,
             image: true,
-            id: true,
+            seen: true,
           },
         })
         .then((data) =>

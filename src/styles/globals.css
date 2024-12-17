@@ -269,6 +269,10 @@ body {
   height: 117.66667px;
 } */
 
+.text-shadow {
+  text-shadow: 1px 1px 16px #000000ca;
+}
+
 .envelope .back .letter {
   z-index: 1;
   position: absolute;

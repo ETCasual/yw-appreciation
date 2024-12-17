@@ -11,47 +11,62 @@ import * as Yup from "yup";
 import { AiOutlineSave } from "react-icons/ai";
 import { toJpeg } from "html-to-image";
 import { toast } from "react-toastify";
+import { useUser } from "@/stores/useUser";
+import { useRouter } from "next/router";
 
 interface EnvelopeProps {
   hint?: boolean;
   sending?: boolean;
-  from?: string;
   to?: string;
   message?: string;
   image?: string | null;
+  id?: string;
 }
 
 export const Envelope: FunctionComponent<EnvelopeProps> = ({
   hint: hintDefault,
   sending,
-  from,
   message,
   image,
-  to,
+  id,
 }) => {
   const [open, setOpen] = useState(false);
   const [hint, setHint] = useState(hintDefault);
   const [file, setFile] = useState<File | undefined>();
   const [shareContent, setShareContent] = useState("");
   const [generatingImage, setGeneratingImage] = useState(false);
-
+  const { number } = useUser();
+  const router = useRouter();
   return (
     <div
       className={`envelope${
         open ? " open" : " new cursor-pointer"
       } h-[250px] w-[325px] sm:h-[265px] sm:w-[370px] sm:max-w-[380px] lg:h-[300px] lg:w-[450px] lg:max-w-none 3xl:h-[366.66667px] 3xl:w-[550px] 3xl:max-w-none`}
-      onClick={() => {
+      onClick={async () => {
+        if (!number) return;
         setOpen(true);
         setHint(false);
+
+        if (!sending) {
+          await fetch("/api/updateSeen", {
+            method: "POST",
+            body: JSON.stringify({ id: id }),
+          });
+        }
       }}
     >
       <div className="back">
         {hint && (
           <div className="absolute left-1/2 top-1/3 z-10 flex w-full -translate-x-1/2 -translate-y-1/2 animate-pulse flex-col items-center justify-center text-black">
-            <p className="font-chi text-2xl font-bold">点击打开</p>
-            <p className="font-en text-lg">Click to open</p>
+            <p className="font-chi text-2xl font-bold">
+              {number ? "点击打开" : "请先登入"}
+            </p>
+            <p className="font-en text-lg">
+              {number ? "Click to open" : "Please login first"}
+            </p>
           </div>
         )}
+
         <div
           className={`letter ${
             generatingImage
@@ -124,45 +139,22 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
             >
               {({ isSubmitting, errors }) =>
                 shareContent ? (
-                  <div className="flex h-full flex-col items-center justify-center">
-                    <p className="text-center font-chi text-lg font-bold">
-                      把这封信交给他/她吧!
+                  <div className="flex h-full flex-col items-center justify-center text-white">
+                    <p className="px-3 text-center font-chi text-lg font-bold">
+                      写多一封给你爱的他/她吧!
                     </p>
-                    <p className="text-center font-en">
-                      Share this letter to your loved ones!
+                    <p className="px-3 text-center font-en">
+                      Write another letter to your loved ones!
                     </p>
-                    <div className="flex flex-row-reverse gap-1 pt-3">
-                      <button
-                        className="rounded-2xl bg-green-400 px-4 py-1 font-en text-xs lg:px-7 lg:text-base"
-                        type="button"
-                        onClick={() =>
-                          navigator.share === undefined
-                            ? navigator.clipboard
-                                .writeText(
-                                  `这是我写给你的一封信! 感谢这一路的伴随 与神同行! 感恩有你! ❤\nHere's a letter from me to you! Thank You for walking with me alongside God in this journey! ❤\n\nhttps://thanksgiving.fgacyc.com/${shareContent} 💌🕊`,
-                                )
-                                .then(() =>
-                                  alert(
-                                    "链接已复制成功! 发送给他/她吧!\nLink copied to clipboard! Send this letter to them!",
-                                  ),
-                                )
-                            : navigator.share({
-                                text: `这是我写给你的一封信! 🔔\n感谢这一路的伴随 与神同行!🏃🏼🏃🏼‍♀\n感恩有你! ❤\nHere's a letter from me to you! 🔔\nThank You for walking with me alongside God in this journey! 🏃🏼🏃🏼‍♀❤\n\nhttps://thanksgiving.fgacyc.com/${shareContent} 💌🕊`,
-                              })
-                        }
-                      >
-                        <span className="font-chi font-bold">分享</span> Share
-                      </button>
-                      <button
-                        className="rounded-2xl border-[1px] border-blue-100 bg-blue-200 px-4 py-1 font-en text-xs text-black/80 lg:px-4 lg:text-base"
-                        onClick={() => {
-                          setShareContent("");
-                          setFile(undefined);
-                        }}
-                      >
-                        <span className="font-chi font-bold">返回</span> Back
-                      </button>
-                    </div>
+                    <button
+                      className="mt-2 rounded-2xl border-[1px] border-blue-100 bg-blue-200 px-4 py-1 font-en text-xs text-black/80 lg:px-4 lg:text-base"
+                      onClick={() => {
+                        setShareContent("");
+                        setFile(undefined);
+                      }}
+                    >
+                      <span className="font-chi font-bold">返回</span> Back
+                    </button>
                   </div>
                 ) : (
                   <Form className="relative flex h-full flex-grow flex-col gap-2 p-3 text-xs md:px-4 md:py-3 lg:text-base">
@@ -194,7 +186,7 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                       <Field
                         className={`${
                           errors.message ? "border border-red-500 " : ""
-                        }font-chi w-full font-bold`}
+                        }font-chi w-full px-0.5 font-bold`}
                         name="to"
                         disabled={isSubmitting}
                         id="to"
@@ -231,7 +223,7 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                       <Field
                         className={`${
                           errors.message ? "border border-red-500 " : ""
-                        }font-chi flex-grow resize-none font-bold`}
+                        }font-chi flex-grow resize-none px-0.5 font-bold`}
                         name="message"
                         disabled={isSubmitting}
                         id="message"
@@ -291,13 +283,13 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
               }
             </Formik>
           ) : (
-            <div className="relative flex h-full w-full flex-col px-2 py-1 md:px-4 md:py-3">
+            <div className="relative flex h-full w-full flex-col px-2 py-1 text-white md:px-4 md:py-3">
               <p className="w-full text-center font-chi text-lg">
                 嘿，想对你说...
               </p>
 
               <div
-                className={`flex h-[calc(100%-60px)] ${
+                className={`flex h-full ${
                   generatingImage ? "flex-col items-center" : "flex-row"
                 } gap-x-2 p-1 lg:gap-x-5 lg:p-2`}
               >
@@ -327,58 +319,67 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                   ))}
                 </div>
               </div>
-              <div className="absolute bottom-2 flex w-full flex-row items-center justify-between pr-5 lg:bottom-3 lg:pr-8">
-                <button
-                  onClick={async () => {
-                    if (generatingImage) return;
-                    const id = toast.loading("图片生成中... 📸");
-                    setGeneratingImage(true);
-                    setTimeout(
-                      () =>
-                        void toJpeg(document.getElementById("main")!, {
-                          quality: 1,
-                          // height: 1080,
-                          // width: 608,
-                        })
-                          .then(async () => {
-                            await toJpeg(document.getElementById("main")!, {
-                              quality: 1,
-                            }).then(function (dataUrl: string) {
-                              const link = document.createElement("a");
-                              const name = `${from}-${to}.jpeg`
-                                .replaceAll(" ", "-")
-                                .replaceAll("/", "_");
-                              link.download = name;
-                              link.href = dataUrl;
-                              toast.update(id, {
-                                render: "图片生成成功! 🎉",
-                                type: "success",
-                                isLoading: false,
-                                autoClose: 2500,
-                              });
-                              link.click();
-                              setGeneratingImage(false);
-                            });
+              {open ? (
+                <div className="absolute bottom-0 flex w-full translate-y-[calc(100%+12px)] flex-row items-center justify-between pr-5 lg:bottom-3 lg:pr-8">
+                  <button
+                    onClick={async () => {
+                      if (generatingImage) return;
+                      const id = toast.loading("图片生成中... 📸");
+                      setGeneratingImage(true);
+                      setTimeout(
+                        () =>
+                          void toJpeg(document.getElementById("main")!, {
+                            quality: 1,
+                            // height: 1080,
+                            // width: 608,
                           })
+                            .then(async () => {
+                              await toJpeg(document.getElementById("main")!, {
+                                quality: 1,
+                              }).then(function (dataUrl: string) {
+                                const link = document.createElement("a");
+                                const name = `${id}.jpeg`
+                                  .replaceAll(" ", "-")
+                                  .replaceAll("/", "_");
+                                link.download = name;
+                                link.href = dataUrl;
+                                toast.update(id, {
+                                  render: "图片生成成功! 🎉",
+                                  type: "success",
+                                  isLoading: false,
+                                  autoClose: 2500,
+                                });
+                                link.click();
+                                setGeneratingImage(false);
+                              });
+                            })
 
-                          .catch((err: unknown) => console.log(err)),
-                      500,
-                    );
-                  }}
-                  className={`${
-                    generatingImage ? "opacity-0 " : ""
-                  }flex flex-row items-center gap-1 rounded-2xl border-[1px] border-blue-100 bg-blue-400 bg-opacity-70 px-2 py-1 transition-all duration-300 hover:bg-opacity-100`}
-                >
-                  <AiOutlineSave className="text-[16px] lg:text-[21px]" />
-                  <p className="font-en text-xs text-black">
-                    <span className="font-chi font-bold">储存卡片</span> Save
-                    Card
-                  </p>
-                </button>
-                <p className="font-en text-xs text-white">
-                  <span className="font-chi">来自</span> From: {from}
-                </p>
-              </div>
+                            .catch((err: unknown) => console.log(err)),
+                        500,
+                      );
+                    }}
+                    className={`${
+                      generatingImage ? "opacity-0 " : ""
+                    }flex flex-row items-center gap-1 rounded-2xl border-[1px] border-blue-100 bg-blue-400 bg-opacity-70 px-2 py-1 transition-all duration-300 hover:bg-opacity-100`}
+                  >
+                    <AiOutlineSave className="text-[16px] lg:text-[21px]" />
+                    <p className="font-en text-xs text-black">
+                      <span className="font-chi font-bold">储存卡片</span> Save
+                      Card
+                    </p>
+                  </button>
+                  <button
+                    className={`rounded-2xl border-[1px] border-blue-100 bg-blue-200 px-4 py-1 font-en text-xs text-black/80 lg:px-4 lg:text-base${
+                      generatingImage ? " opacity-0" : ""
+                    }`}
+                    onClick={async () => {
+                      await router.push("/");
+                    }}
+                  >
+                    <span className="font-chi font-bold">返回</span> Back
+                  </button>
+                </div>
+              ) : null}
             </div>
           )}
         </div>
