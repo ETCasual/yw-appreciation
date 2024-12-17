@@ -54,7 +54,11 @@ function MainPage() {
                 <Formik<{ phone: string }>
                   initialValues={{ phone: number }}
                   onSubmit={(value) => {
-                    setNumber(value.phone);
+                    setNumber(
+                      value.phone.startsWith("6")
+                        ? value.phone.slice(1)
+                        : value.phone,
+                    );
                     setModalOpen(false);
                   }}
                   validationSchema={Yup.object().shape({

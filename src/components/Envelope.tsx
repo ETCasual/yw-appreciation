@@ -207,9 +207,10 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                       <Field
                         className={`${
                           errors.message ? "border border-red-500 " : ""
-                        }font-chi w-full px-0.5 font-bold`}
+                        }font-en w-full px-0.5 font-bold`}
                         name="to"
                         disabled={isSubmitting}
+                        placeholder={"0188888888"}
                         id="to"
                         onPaste={(e: ClipboardEvent) => {
                           if (!e.clipboardData) return;
@@ -244,7 +245,7 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                       <Field
                         className={`${
                           errors.message ? "border border-red-500 " : ""
-                        }font-chi flex-grow resize-none px-0.5 font-bold`}
+                        }font-en flex-grow resize-none px-0.5 font-bold`}
                         name="message"
                         disabled={isSubmitting}
                         id="message"
