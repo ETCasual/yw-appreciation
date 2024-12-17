@@ -77,6 +77,14 @@ function MainPage() {
                         onChange={async (e) => {
                           await setFieldValue("phone", e.target.value);
                         }}
+                        onPaste={(e) => {
+                          if (!e.clipboardData) return;
+                          const pasteData = e.clipboardData.getData("Text");
+                          // Allow only digits
+                          if (!/^\d*$/.test(pasteData)) {
+                            e.preventDefault();
+                          }
+                        }}
                         value={values.phone}
                         placeholder="0123456789"
                         name="phone"

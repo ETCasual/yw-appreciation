@@ -105,7 +105,11 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                 message: "",
               }}
               validationSchema={Yup.object().shape({
-                to: Yup.string().required("Required."),
+                to: Yup.string()
+                  .required("Required.")
+                  .min(10)
+                  .max(11)
+                  .matches(/^0/, "The string must start with '0'"),
                 message: Yup.string().required("Required."),
               })}
               onSubmit={async (values, actions) => {
@@ -114,7 +118,9 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                 if (file) {
                   await uploadFile(file).then(async (data) => {
                     await sendFetch(
-                      values.to,
+                      values.to.startsWith("6")
+                        ? values.to.slice(1)
+                        : values.to,
                       values.message,
                       `https://ywkl-image-storage.s3.ap-southeast-1.amazonaws.com/${data}`,
                     ).then(async (rt) => {
@@ -132,21 +138,23 @@ export const Envelope: FunctionComponent<EnvelopeProps> = ({
                     });
                   });
                 } else {
-                  await sendFetch(values.to, values.message, "").then(
-                    async (rt) => {
-                      await rt.json().then((share) => {
-                        toast.update(id, {
-                          render: "卡片上传成功! 🎉",
-                          type: "success",
-                          isLoading: false,
-                          autoClose: 2500,
-                        });
-                        setShareContent(share.id);
-                        actions.setSubmitting(false);
-                        actions.resetForm();
+                  await sendFetch(
+                    values.to.startsWith("6") ? values.to.slice(1) : values.to,
+                    values.message,
+                    "",
+                  ).then(async (rt) => {
+                    await rt.json().then((share) => {
+                      toast.update(id, {
+                        render: "卡片上传成功! 🎉",
+                        type: "success",
+                        isLoading: false,
+                        autoClose: 2500,
                       });
-                    },
-                  );
+                      setShareContent(share.id);
+                      actions.setSubmitting(false);
+                      actions.resetForm();
+                    });
+                  });
                 }
               }}
             >
